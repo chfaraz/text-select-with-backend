@@ -8,7 +8,7 @@ handler.use(middleware);
 
 handler.post(async (req, res) => {
     let data = req.body;
-    let doc = await req.db.collection('posts').deleteOne({ _id: ObjectId(data._id) });
+    let doc = await req.db.collection('posts').deleteOne({ selectedText: data.selectedText });
     res.status(200).json({ message: 'ok' });
 });
 

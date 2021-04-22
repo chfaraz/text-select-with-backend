@@ -308,16 +308,16 @@ function Home() {
         });
         setState(data);
     };
-    const deleteData = () => {
+    const deleteData = async () => {
         const hovere = hoverData.filter((hoverdata) => {
             return hoverdata !== null;
         });
-        const found = state.find((data) => hovere[0] === data.writtenText);
+        const found = await state.find((data) => hovere[0] === data.writtenText);
         console.log(found);
         if (found !== undefined) {
             axios
                 .post('/api/delete', {
-                    _id: found._id,
+                    selectedText: found.selectedText,
                 })
                 .then(function (response) {
                     deleteFromState(hovere);
