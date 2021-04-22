@@ -120,54 +120,69 @@ function Home() {
         var d = new Date();
         let duplicate = false;
         if (text !== '') {
-            if (state.length !== 0) {
-                state.forEach((data, index) => {
-                    if (selection === data.selectedText) {
-                        toast.error('Please Delete The Previous One First!', {
-                            position: 'top-right',
-                            autoClose: 5000,
-                            hideProgressBar: false,
-                            closeOnClick: true,
-                            pauseOnHover: true,
-                            draggable: true,
-                            progress: undefined,
-                        });
-                        // let temp_state = [...state];
-                        // let temp_element = { ...temp_state[index] };
-                        // temp_element.writtenText = text;
-                        // temp_state[index] = temp_element;
-                        // setState(temp_state);
-                        duplicate = true;
-                    } else {
-                        setState(
-                            state.concat({
-                                writtenText: text,
-                                selectedText: selection,
-                            })
-                        );
-                    }
-                });
-            } else if (state.length === 0) {
-                setState(
-                    state.concat({
-                        writtenText: text,
-                        selectedText: selection,
-                    })
-                );
-            }
-            !duplicate
+            const found = state.find((data) => selection === data.selectedText);
+            console.log(found);
+            // if (state.length !== 0) {
+            //     state.find((data, index) => {
+            //         if (selection === data.selectedText) {
+            //             toast.error('Please Delete The Previous One First!', {
+            //                 position: 'top-right',
+            //                 autoClose: 5000,
+            //                 hideProgressBar: false,
+            //                 closeOnClick: true,
+            //                 pauseOnHover: true,
+            //                 draggable: true,
+            //                 progress: undefined,
+            //             });
+            //             // let temp_state = [...state];
+            //             // let temp_element = { ...temp_state[index] };
+            //             // temp_element.writtenText = text;
+            //             // temp_state[index] = temp_element;
+            //             // setState(temp_state);
+            //             duplicate = true;
+            //         } else {
+            //             setState(
+            //                 state.concat({
+            //                     writtenText: text,
+            //                     selectedText: selection,
+            //                 })
+            //             );
+            //         }
+            //     });
+            // } else if (state.length === 0) {
+            //     setState(
+            //         state.concat({
+            //             writtenText: text,
+            //             selectedText: selection,
+            //         })
+            //     );
+            // }
+            found === undefined
                 ? axios
                       .post('/api/postData', {
                           writtenText: text,
                           selectedText: selection,
                       })
                       .then(function (response) {
-                          console.log(response);
+                          setState(
+                              state.concat({
+                                  writtenText: text,
+                                  selectedText: selection,
+                              })
+                          );
                       })
                       .catch(function (error) {
                           console.log(error);
                       })
-                : null;
+                : toast.error('Please Delete The Previous One First!', {
+                      position: 'top-right',
+                      autoClose: 5000,
+                      hideProgressBar: false,
+                      closeOnClick: true,
+                      pauseOnHover: true,
+                      draggable: true,
+                      progress: undefined,
+                  });
 
             setPopup(false);
         } else {
@@ -297,21 +312,20 @@ function Home() {
         const hovere = hoverData.filter((hoverdata) => {
             return hoverdata !== null;
         });
-
-        state.forEach((state) => {
-            if (hovere[0] === state.writtenText) {
-                axios
-                    .post('/api/delete', {
-                        _id: state._id,
-                    })
-                    .then(function (response) {
-                        deleteFromState(hovere);
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
-            }
-        });
+        const found = state.find((data) => hovere[0] === data.writtenText);
+        console.log(found);
+        if (found !== undefined) {
+            axios
+                .post('/api/delete', {
+                    _id: found._id,
+                })
+                .then(function (response) {
+                    deleteFromState(hovere);
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        }
 
         var ele2 = document.getElementById('tip');
         ele2.style.display = 'none';
