@@ -4,7 +4,7 @@ import { gql } from '@apollo/client';
 
 const AppContext = createContext();
 
-export function AppWrapper({ children }) {
+export function AppWrapper({ children, data }) {
     const [state, setstate] = useState('');
     useEffect(() => {
         client

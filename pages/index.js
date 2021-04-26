@@ -14,10 +14,10 @@ import { useRouter } from 'next/router';
 
 import { useAppContext } from '../state';
 
-const Posts = () => {
+const Posts = ({ data }) => {
     const dataa = useAppContext();
     console.log(dataa);
-    const [movies, setMovies] = useState([]);
+    const [movies, setMovies] = useState(data.episodesByIds);
 
     const router = useRouter();
 
@@ -80,13 +80,25 @@ const Posts = () => {
     );
 };
 
-// export async function getServerSideProps() {
+export async function getServerSideProps() {
+    const { data } = await client.query({
+        query: gql`
+            query {
+                episodesByIds(ids: [3, 4, 5, 6, 7, 8]) {
+                    id
+                    name
+                    air_date
+                    episode
+                }
+            }
+        `,
+    });
 
-//     return {
-//         props: {
-//             data,
-//         },
-//     };
-// }
+    return {
+        props: {
+            data,
+        },
+    };
+}
 
 export default Posts;
