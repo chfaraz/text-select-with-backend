@@ -43,7 +43,7 @@ const PostInfo = () => {
         <div>
             <Post img={`${router.query.img}.webp`} h title={movies.name} time={movies.air_date} episode={movies.episode} />
 
-            <PostDetail img="http://c.files.bbci.co.uk/4ABA/production/_117803191_gettyimages-1232003438.jpg" title="Art or just a crap?" img2="https://i.pinimg.com/originals/66/59/44/665944970605ed2273788a068895ea39.jpg" />
+            {/* <PostDetail img="http://c.files.bbci.co.uk/4ABA/production/_117803191_gettyimages-1232003438.jpg" title="Art or just a crap?" img2="https://i.pinimg.com/originals/66/59/44/665944970605ed2273788a068895ea39.jpg" /> */}
         </div>
     );
 };
