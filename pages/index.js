@@ -65,8 +65,8 @@ const Posts = ({ data }) => {
                             key={i}
                             onClick={() =>
                                 router.push({
-                                    pathname: '/postInfo',
-                                    query: { pid: movie.id, img: i + 1 },
+                                    pathname: '/postInfo/[pid]',
+                                    query: { pid: movie.id },
                                 })
                             }
                             className="cursor-pointer"
