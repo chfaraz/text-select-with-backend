@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
 
 import Button from '@material-ui/core/Button';
 
@@ -124,6 +125,15 @@ function Home({ data }) {
             <ToastContainer position="top-right" autoClose={5000} hideProgressBar={false} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover />
             {/* Same as */}
             <ToastContainer />
+            <div className="flex justify-center mt-[20px] ">
+                <Link href="/posts">
+                    <a>
+                        <Button variant="contained" color="secondary">
+                            Posts
+                        </Button>
+                    </a>
+                </Link>
+            </div>
         </div>
     );
 }
