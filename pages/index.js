@@ -1,150 +1,92 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
+import Post from '../components/post';
 import Link from 'next/link';
 
-import Button from '@material-ui/core/Button';
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from '@material-ui/core/Toolbar';
+import Typography from '@material-ui/core/Typography';
+import IconButton from '@material-ui/core/IconButton';
+import MenuIcon from '@material-ui/icons/Menu';
 
-import { CSVLink, CSVDownload } from 'react-csv';
-import regexifyString from 'regexify-string';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import client from '../apollo-client';
+import { gql } from '@apollo/client';
+import { useRouter } from 'next/router';
 
-import Popup from '../components/popup';
-import Tip from '../components/tip';
+import { useAppContext } from '../state';
 
-function Home({ data }) {
-    const [state, setState] = useState(data);
-    const [popup, setPopup] = useState(false);
-    const [selection, setSelection] = useState('');
-    const [hoverData, setHover] = useState('');
-    const [paragraph, setParagraph] = useState(
-        'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque equat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus. Donec vitae sapien ut libero venenatis faucibus. Nullam quis ante. Etiam sit amet orci eget eros faucibus tincidunt. Duis leo. Sed fringilla mauris sit amet nibh. Donec sodales sagittis magna. Sed consequat, leo eget bibendum sodales, augue velit cursus nunc, Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, eque sed ipsum. Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus. Donec vitae sapien ut libero venenatis faucibus. Nullam quis ante. Etiam sit amet orci eget eros faucibus tincidunt. Duis leo. Sed fringilla mauris sit amet nibh. Donec sodales sagittis magna. Sed consequat, leo eget bibendum sodales, augue velit cursus nunc,'
-    );
+const Posts = () => {
+    const dataa = useAppContext();
+    console.log(dataa);
+    const [movies, setMovies] = useState([]);
 
-    function useOutsideClick(ref) {
-        useEffect(() => {
-            function handleClickOutside(event) {
-                if (ref.current && !ref.current.contains(event.target)) {
-                    if (!selection) {
-                        var ele = document.getElementById('aa');
-                        ele.style.display = 'none';
+    const router = useRouter();
+
+    useEffect(async () => {
+        if (dataa.length !== 0) {
+            console.log('if--------------------');
+            setMovies(dataa);
+        } else {
+            console.log('fetch your self');
+            const { data } = await client.query({
+                query: gql`
+                    query {
+                        episodesByIds(ids: [3, 4, 5, 6, 7, 8]) {
+                            id
+                            name
+                            air_date
+                            episode
+                        }
                     }
-                }
-            }
-
-            document.addEventListener('mousedown', handleClickOutside);
-            return () => {
-                document.removeEventListener('mousedown', handleClickOutside);
-            };
-        }, [ref]);
-    }
-
-    const mouseUp = function (e) {
-        var aaa = document.getElementById('aa');
-        var x = e.clientX;
-        var y = e.clientY;
-        var selection;
-        var p = '';
-        selection = window.getSelection();
-        if (!popup) {
-            p = selection.toString();
-            setSelection(p);
+                `,
+            });
+            setMovies(data.episodesByIds);
         }
-        if (p.length > 0 && !popup) {
-            aaa.style.display = 'block';
-            aaa.style.top = y - 140 + 'px';
-            aaa.style.left = x - 90 + 'px';
-        }
-    };
-    const clicked = (e) => {
-        setPopup(true);
-        var ele = document.getElementById('aa');
-        ele.style.display = 'none';
-        // e.stopPropagation();
-    };
+    }, []);
 
-    const hover = (e) => {
-        let data = state.map((state) => {
-            return state.selectedText.toUpperCase() === e.target.innerText.toUpperCase() ? state.writtenText : null;
-        });
-        setHover(data);
-        console.log(data.join(''));
-        console.log(e.clientX, e.clientY);
+    // const data = await res.json();
 
-        var tip = document.getElementById('tip');
-        var x = e.clientX;
-        var y = e.clientY;
-
-        tip.style.display = 'block';
-        tip.style.top = y - 70 + 'px';
-        tip.style.left = x - 40 + 'px';
-    };
-
-    const wrapperRef = useRef(null);
-    useOutsideClick(wrapperRef);
-
-    console.log(state);
-    const highlight = state.map((state) => {
-        return state.selectedText;
-    });
-    var values = highlight.join('|');
-
+    console.log(movies);
     return (
-        <div className="App">
-            <h1>Select And Mark Some Text</h1>
-            <div className="">
-                <div id="ele2" className="text" onMouseUp={(e) => mouseUp(e)}>
-                    <span>
-                        {highlight.length !== 0
-                            ? regexifyString({
-                                  pattern: new RegExp(`(${values})`, 'gi'),
-                                  decorator: (highlight, index) => {
-                                      return (
-                                          <span key={index} style={{ fontWeight: 'bold', background: 'yellow', cursor: 'pointer' }} onClick={(e) => hover(e)}>
-                                              {highlight}
-                                          </span>
-                                      );
-                                  },
-                                  input: paragraph,
-                              })
-                            : paragraph}
-                    </span>
-                    <div ref={wrapperRef} id="aa" onClick={(e) => clicked(e)}>
-                        <Button variant="contained" color="secondary">
-                            +
-                        </Button>
-                    </div>
-                </div>
-                <Tip hoverData={hoverData} state={state} setState={setState} />
-                {popup ? <Popup selection={selection} setState={setState} setPopup={setPopup} state={state} /> : null}
-                <div className="download">
-                    <Button variant="contained" color="secondary">
-                        <CSVLink data={state}>Download</CSVLink>
-                    </Button>
-                </div>
+        <>
+            <AppBar position="static">
+                <Toolbar variant="dense">
+                    <IconButton edge="start" className="" color="inherit" aria-label="menu">
+                        <MenuIcon />
+                    </IconButton>
+                    <Typography variant="h6" color="inherit">
+                        <Link href="/postInfo">Posts</Link>
+                    </Typography>
+                </Toolbar>
+            </AppBar>
+            <div className="grid grid-cols-3 gap-[15px] p-[15px] bg-[#d5d5d5]">
+                {movies.map((movie, i) => {
+                    return (
+                        <div
+                            key={i}
+                            onClick={() =>
+                                router.push({
+                                    pathname: '/postInfo',
+                                    query: { pid: movie.id, img: i + 1 },
+                                })
+                            }
+                            className="cursor-pointer"
+                        >
+                            <Post img={`${i + 1}.webp`} title={movie.name} time={movie.air_date} episode={movie.episode} />
+                        </div>
+                    );
+                })}
             </div>
-            <ToastContainer position="top-right" autoClose={5000} hideProgressBar={false} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover />
-            {/* Same as */}
-            <ToastContainer />
-            <div className="flex justify-center mt-[20px] ">
-                <Link href="/posts">
-                    <a>
-                        <Button variant="contained" color="secondary">
-                            Posts
-                        </Button>
-                    </a>
-                </Link>
-            </div>
-        </div>
+        </>
     );
-}
+};
 
-export async function getServerSideProps() {
-    // Fetch data from external API
-    const res = await fetch(`http://localhost:3000/api/getData`);
-    const data = await res.json();
-    console.log(data);
-    // Pass data to the page via props
-    return { props: { data } };
-}
+// export async function getServerSideProps() {
 
-export default Home;
+//     return {
+//         props: {
+//             data,
+//         },
+//     };
+// }
+
+export default Posts;
